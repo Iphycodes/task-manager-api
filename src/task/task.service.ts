@@ -42,6 +42,8 @@ export class TaskService {
       query['title'] = { $regex: search, $options: 'i' };
     }
 
+    console.log('inside get user tasks');
+
     const task = await this.taskModel
       .find(query)
       .sort({ createdAt: -1 })
@@ -79,44 +81,47 @@ export class TaskService {
     return task;
   }
 
+  // async updateTask(
+  //   taskId: string,
+  //   updateTaskDto: UpdateTaskDto,
+  //   userId: string,
+  // ): Promise<Task> {
+  //   const task = this.taskModel.findOne({ _id: taskId, user: userId });
+  //   if (!task) {
+  //     throw new NotFoundException('Task not found');
+  //   }
+
+  //   // if ((await task).user !== userId) {
+  //   //   throw new UnauthorizedException(
+  //   //     'You cannot update a task you do not own',
+  //   //   );
+  //   // }
+
+  //   Object.assign(task, updateTaskDto);
+
+  //   return (await task).save();
+  // }
+
   async updateTask(
-    taskId: string,
+    id: string,
     updateTaskDto: UpdateTaskDto,
     userId: string,
   ): Promise<Task> {
-    const task = this.taskModel.findOne({ _id: taskId, user: userId });
+    const task = await this.taskModel.findOneAndUpdate(
+      { _id: id, user: userId },
+      updateTaskDto,
+      { new: true },
+    );
+
+    // console.log('task user::', task.user);
+    // console.log('loggedIn user::', userId);
+
     if (!task) {
-      throw new NotFoundException('Task not found');
+      throw new NotFoundException(`Task with ID "${id}" not found`);
     }
 
-    if ((await task).user !== userId) {
-      throw new UnauthorizedException(
-        'You cannot update a task you do not own',
-      );
-    }
-
-    Object.assign(task, updateTaskDto);
-
-    return (await task).save();
+    return task;
   }
-
-  // async updateTask(
-  //   id: string,
-  //   updateTaskDto: UpdateTaskDto,
-  //   user: User,
-  // ): Promise<Task> {
-  //   const task = await this.taskModel.findOneAndUpdate(
-  //     { _id: id, user: user._id },
-  //     updateTaskDto,
-  //     { new: true },
-  //   );
-
-  //   if (!task) {
-  //     throw new NotFoundException(`Task with ID "${id}" not found`);
-  //   }
-
-  //   return task;
-  // }
 
   async deleteTask(taskId: string, userId: string) {
     const result = this.taskModel.deleteOne({ _id: taskId, user: userId });
@@ -124,5 +129,7 @@ export class TaskService {
     if ((await result).deletedCount === 0) {
       throw new NotFoundException('Task not found');
     }
+
+    return { message: 'Task deleted successfully' };
   }
 }

@@ -54,8 +54,10 @@ export class TaskController {
     @Query('page') page?: number,
     @Query('limit') limit?: number,
   ) {
+    console.log('inside getTask controller');
+    console.log(req.user);
     return this.taskService.getUserTasks(
-      req.user.id,
+      req.user.sub,
       status,
       search,
       page,
@@ -66,7 +68,7 @@ export class TaskController {
   @Get(':id')
   @ApiOperation({ summary: 'Get One' })
   async getTaskById(@Request() req: any, @Param('id') taskId: string) {
-    return this.taskService.getTaskById(taskId, req.user.id);
+    return this.taskService.getTaskById(taskId, req.user.sub);
   }
 
   @Put(':id')
@@ -87,13 +89,13 @@ export class TaskController {
     @Param('id') taskId: string,
     @Body() updateTaskDto: UpdateTaskDto,
   ) {
-    return this.taskService.updateTask(taskId, updateTaskDto, req.user.id);
+    return this.taskService.updateTask(taskId, updateTaskDto, req.user.sub);
   }
 
   @Delete(':id')
   @ApiOperation({ summary: 'Delete' })
   @ApiResponse({ status: 201, description: 'task deleted successfully' })
-  async deleteTask(@Param('id') taskId: string, @Request() req) {
-    return this.taskService.deleteTask(taskId, req.user.id);
+  async deleteTask(@Param('id') taskId: string, @Request() req: any) {
+    return this.taskService.deleteTask(taskId, req.user.sub);
   }
 }
