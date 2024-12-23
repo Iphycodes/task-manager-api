@@ -16,13 +16,14 @@ import {
   ApiBearerAuth,
   ApiBody,
   ApiOperation,
+  ApiParam,
   ApiQuery,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
 import { JWTGuard } from 'src/auth/guards/jwt.guard';
 import { TaskService } from './task.service';
-import { CreateTaskDto, UpdateTaskDto } from './dto/task.dto';
+import { CreateTaskDto, TaskFilterDto, UpdateTaskDto } from './dto/task.dto';
 import { TaskStatus } from 'src/utils/constant';
 
 @ApiTags('tasks')
@@ -47,25 +48,29 @@ export class TaskController {
   @ApiQuery({ name: 'search', required: false })
   @ApiQuery({ name: 'page', required: false, type: Number })
   @ApiQuery({ name: 'limit', required: false, type: Number })
-  async getUserTasks(
-    @Request() req: any,
-    @Query('status') status?: TaskStatus,
-    @Query('search') search?: string,
-    @Query('page') page?: number,
-    @Query('limit') limit?: number,
-  ) {
-    console.log('inside getTask controller');
-    console.log(req.user);
-    return this.taskService.getUserTasks(
-      req.user.sub,
-      status,
-      search,
-      page,
-      limit,
-    );
+  // async getUserTasks(
+  //   @Request() req: any,
+  //   @Query('status') status?: TaskStatus,
+  //   @Query('search') search?: string,
+  //   @Query('page') page?: number,
+  //   @Query('limit') limit?: number,
+  // ) {
+  //   console.log('inside getTask controller');
+  //   console.log(req.user);
+  //   return this.taskService.getUserTasks(
+  //     req.user.sub,
+  //     status,
+  //     search,
+  //     page,
+  //     limit,
+  //   );
+  // }
+  async getUserTasks(@Query() filterDto: TaskFilterDto, @Request() req: any) {
+    return this.taskService.getTasks(filterDto, req.user.sub);
   }
 
   @Get(':id')
+  @ApiParam({ name: 'id', required: true, type: String })
   @ApiOperation({ summary: 'Get One' })
   async getTaskById(@Request() req: any, @Param('id') taskId: string) {
     return this.taskService.getTaskById(taskId, req.user.sub);

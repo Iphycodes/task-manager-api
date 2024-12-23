@@ -4,6 +4,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { AuthModule } from './auth/auth.module';
 import { APP_PIPE } from '@nestjs/core';
 import { TaskModule } from './task/task.module';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { TaskModule } from './task/task.module';
     }),
     AuthModule,
     TaskModule,
+    UsersModule,
   ],
   controllers: [],
   providers: [

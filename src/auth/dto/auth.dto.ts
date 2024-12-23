@@ -7,6 +7,7 @@ export class CreateUserDto {
     description: 'User email address',
     example: 'user@example.com',
     required: true,
+    default: 'user@example.com',
   })
   @Prop({
     required: true,
@@ -23,6 +24,7 @@ export class CreateUserDto {
       'User password (must contain uppercase, lowercase, number, and special character)',
     example: 'StrongPass123!',
     required: true,
+    default: 'StrongPass123!',
   })
   @IsNotEmpty({ message: 'Password is required' })
   @MinLength(8, { message: 'Password must be at least 8 characters long' })
@@ -44,6 +46,7 @@ export class LoginUserDto {
     description: 'User email address',
     example: 'user@example.com',
     required: true,
+    default: 'user@example.com',
   })
   @IsEmail({}, { message: 'Invalid email format' })
   @IsNotEmpty({ message: 'Email is required' })
@@ -53,6 +56,7 @@ export class LoginUserDto {
     description: 'User password',
     example: 'StrongPass123!',
     required: true,
+    default: 'StrongPass123!',
   })
   @IsNotEmpty({ message: 'Password is required' })
   password: string;

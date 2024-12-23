@@ -3,6 +3,7 @@ import {
   ConflictException,
   UnauthorizedException,
   Logger,
+  NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -96,5 +97,21 @@ export class AuthService {
       this.logger.error(`Login error: ${error.message}`);
       throw error;
     }
+  }
+
+  async getLoggedInUser(userId: string): Promise<Partial<User>> {
+    const loggedInUser = (
+      await this.userModel.findOne({ _id: userId })
+    ).toObject();
+    const { password, ...userWithoutPassword } = loggedInUser;
+
+    if (userWithoutPassword._id) {
+      userWithoutPassword._id = userWithoutPassword._id.toString();
+    }
+    console.log('loggedin user::', loggedInUser);
+    if (!loggedInUser) {
+      throw new NotFoundException('User not found');
+    }
+    return userWithoutPassword;
   }
 }

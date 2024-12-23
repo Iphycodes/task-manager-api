@@ -7,10 +7,21 @@ import {
   HttpStatus,
   UseInterceptors,
   ClassSerializerInterceptor,
+  Get,
+  Request,
+  UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDto, LoginUserDto } from './dto/auth.dto';
-import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
+import { JWTGuard } from './guards/jwt.guard';
+import { User } from './model/user.model';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -96,5 +107,13 @@ export class AuthController {
     @Body(new ValidationPipe()) loginUserDto: LoginUserDto,
   ): Promise<{ access_token: string }> {
     return this.authService.login(loginUserDto);
+  }
+
+  @Get('loggedInUser')
+  @UseGuards(JWTGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get LoggedInUser' })
+  async getLoggedInUser(@Request() req: any): Promise<Partial<User>> {
+    return this.authService.getLoggedInUser(req.user.sub);
   }
 }
